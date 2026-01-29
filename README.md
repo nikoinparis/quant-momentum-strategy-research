@@ -4,34 +4,40 @@
 ---
 
 ## Overview
-This project implements and evaluates a simple **time-series momentum trading strategy** on SPY, and demonstrates how **volatility regime filtering** can materially improve risk-adjusted performance.
+This project implements and evaluates a **time-series momentum trading strategy** on SPY, and demonstrates how **volatility regime filtering** can materially improve risk-adjusted performance.
 
 The goal of the project is not to optimize a single backtest, but to:
 - build a clean research pipeline,
 - validate performance across time using rolling windows,
 - test robustness to parameter changes,
-- and present results with proper financial metrics.
+- and present results using standard financial metrics.
 
 ---
 
 ## Strategy Description
 
 ### Baseline: Momentum (60-day)
-- Signal:  
+- Signal:
+  
   \[
   s_t = \frac{P_t}{P_{t-60}} - 1
   \]
+
 - Position rule:
   - Long (+1) if signal > 0  
   - Short (−1) if signal < 0  
-  - Flat (0) otherwise
+  - Flat (0) otherwise  
+
+---
 
 ### Volatility Regime Filter
 - Rolling 20-day standard deviation of daily log returns
 - Trading is allowed only when:
+
   \[
   \sigma_{20} \leq \text{vol\_threshold}
   \]
+
 - When volatility exceeds the threshold, positions are gated to 0 (flat)
 
 This filter is designed to reduce exposure during high-volatility regimes where momentum signals tend to be noisy.
@@ -41,7 +47,7 @@ This filter is designed to reduce exposure during high-volatility regimes where 
 ## Data
 - Instrument: **SPY (S&P 500 ETF)**
 - Frequency: Daily
-- Price: Adjusted Close
+- Price field: Adjusted Close
 - Source: `yfinance`
 - Date range: 2015–2026
 
@@ -50,7 +56,7 @@ Downloaded price data is cached locally and **not committed** to the repository.
 ---
 
 ## Evaluation Metrics
-The following metrics are computed from daily log returns:
+Metrics are computed from daily log returns:
 
 - Final Equity
 - Annualized Return
@@ -64,6 +70,7 @@ The following metrics are computed from daily log returns:
 ## Key Results
 
 ### Aggregate Performance
+
 | Strategy | Final Equity | Annual Return | Annual Vol | Sharpe | Max Drawdown |
 |--------|--------------|---------------|------------|--------|--------------|
 | Momentum (60d) | 1.916 | 6.12% | 17.75% | 0.33 | −25.55% |
@@ -76,9 +83,9 @@ Volatility filtering improves both **returns** and **risk-adjusted performance**
 ## Rolling Window Validation
 
 Rolling 3-year Sharpe ratios (monthly step) show that the volatility-filtered strategy:
-- Has higher **mean and median Sharpe**
-- Performs better across most market regimes
-- Recovers faster after high-volatility shocks
+- has higher mean and median Sharpe,
+- performs better across most market regimes,
+- recovers faster after volatility shocks.
 
 | Metric | Momentum | Vol-Filtered |
 |------|----------|--------------|
@@ -90,20 +97,23 @@ Rolling 3-year Sharpe ratios (monthly step) show that the volatility-filtered st
 
 ## Volatility Threshold Sensitivity
 
-Robustness was tested across reasonable volatility thresholds:
-
 | Vol Threshold | Final Equity | Sharpe | Max Drawdown | Avg Trading % |
 |--------------|--------------|--------|--------------|---------------|
 | 0.015 | 2.64 | 0.67 | −18.7% | 88.3% |
 | 0.020 | 2.31 | 0.51 | −24.6% | 96.1% |
 | 0.025 | 2.19 | 0.46 | −24.3% | 97.2% |
 
-Performance degrades smoothly as the filter loosens, indicating that the improvement is **structural rather than overfit**.
+Performance degrades smoothly as the filter loosens, indicating the improvement is **structural rather than overfit**.
 
 ---
 
 ## Figures
-Key plots are saved under `results/figures/`:
+
+Key plots are saved under:
+
+results/figures/
+
+Including:
 - Strategy equity curves
 - Drawdown comparison
 - Rolling 3-year Sharpe comparison
@@ -137,13 +147,14 @@ Key plots are saved under `results/figures/`:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip3 install -e .
+pip install -e .
 
-python3 -m scripts.make_dataset
-python3 -m scripts.report_metrics
-python3 -m scripts.grid_search_momentum
-python3 -m scripts.rolling_window_vol_compare
-python3 -m scripts.vol_threshold_sensitivity
+python -m scripts.make_dataset
+python -m scripts.report_metrics
+python -m scripts.grid_search_momentum
+python -m scripts.rolling_window_vol_compare
+python -m scripts.vol_threshold_sensitivity
+```
 
 
 ⸻
@@ -151,13 +162,13 @@ python3 -m scripts.vol_threshold_sensitivity
 Notes
 	•	This project is for research and educational purposes only
 	•	No live trading or execution logic is included
-	•	All analysis is done using daily data and simple position sizing
+	•	All analysis uses daily data and simple position sizing
 
 ⸻
 
 Next Steps
 
 This project serves as a foundation for:
-	•	predictive modeling (ML-based return forecasting),
+	•	ML-based return forecasting,
 	•	multi-asset portfolio construction,
-	•	and dynamic risk allocation.
+	•	dynamic risk allocation and regime detection.
