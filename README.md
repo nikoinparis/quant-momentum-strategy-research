@@ -165,10 +165,3 @@ Notes
 	•	All analysis uses daily data and simple position sizing
 
 ⸻
-
-Next Steps
-
-This project serves as a foundation for:
-	•	ML-based return forecasting,
-	•	multi-asset portfolio construction,
-	•	dynamic risk allocation and regime detection.
